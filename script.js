@@ -1,28 +1,36 @@
 //your code here
-const draggables = document.querySelectorAll('.draggable');
-const container = document.getElementById('container');
+const divs = document.querySelectorAll('.draggable');
 
-draggables.forEach(draggable => {
-    draggable.addEventListener('dragstart', (e) => {
-        e.target.classList.add('dragging');
-        e.dataTransfer.setData('backgroundImage', e.target.style.backgroundImage);
+// Store the dragged element
+let draggedElement = null;
+
+// Add event listeners to each div for drag-and-drop
+divs.forEach(div => {
+    // When dragging starts
+    div.addEventListener('dragstart', (e) => {
+        draggedElement = e.target;
+        e.target.style.opacity = '0.5';
     });
 
-    draggable.addEventListener('dragend', (e) => {
-        e.target.classList.remove('dragging');
+    // When dragging ends
+    div.addEventListener('dragend', (e) => {
+        e.target.style.opacity = '1';
     });
-});
 
-container.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    const afterElement = getDragAfterElement(container, e.clientY);
-    const draggable = document.querySelector('.dragging');
-    if (afterElement == null) {
-        container.appendChild(draggable);
-    } else {
-		const afterElementBg = afterElement.style.backgroundImage;
-        afterElement.style.backgroundImage = e.dataTransfer.getData('backgroundImage');
-        draggable.style.backgroundImage = afterElementBg;
-        container.insertBefore(draggable, afterElement);
-    }
+    // When an element is dragged over another
+    div.addEventListener('dragover', (e) => {
+        e.preventDefault(); // Necessary for the drop event to work
+    });
+
+    // When an element is dropped on another
+    div.addEventListener('drop', (e) => {
+        e.preventDefault();
+
+        // Swap the background images of the dragged and dropped elements
+        if (draggedElement !== e.target) {
+            let temp = draggedElement.style.backgroundImage;
+            draggedElement.style.backgroundImage = e.target.style.backgroundImage;
+            e.target.style.backgroundImage = temp;
+        }
+    });
 });
